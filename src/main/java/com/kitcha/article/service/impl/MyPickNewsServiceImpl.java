@@ -2,7 +2,7 @@ package com.kitcha.article.service.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.kitcha.article.client.ArticleCrawler;
-import com.kitcha.article.client.GroqApiClient;
+import com.kitcha.article.client.OpenAiClient;
 import com.kitcha.article.client.NaverApiClient;
 import com.kitcha.article.dto.response.MyPickNewsResponseDto;
 import com.kitcha.article.service.MyPickNewsService;
@@ -23,7 +23,7 @@ public class MyPickNewsServiceImpl implements MyPickNewsService {
     @Autowired
     private ArticleCrawler articleCrawler;
     @Autowired
-    private GroqApiClient groqApiClient;
+    private OpenAiClient openAiClient;
 
     private final Random random = new Random();
 
@@ -56,7 +56,7 @@ public class MyPickNewsServiceImpl implements MyPickNewsService {
             String articleContent = articleCrawler.getArticleContent(newsUrl);
 
             // Groq API 요약
-            Map<String, String> summaries = groqApiClient.getArticleSummaries(articleContent);
+            Map<String, String> summaries = openAiClient.getArticleSummaries(articleContent);
             String longSummary = summaries.getOrDefault("longSummary", "요약 실패");
 
             // DTO 생성 및 추가

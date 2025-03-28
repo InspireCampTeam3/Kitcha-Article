@@ -2,7 +2,7 @@ package com.kitcha.article.service.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.kitcha.article.client.ArticleCrawler;
-import com.kitcha.article.client.GroqApiClient;
+import com.kitcha.article.client.OpenAiClient;
 import com.kitcha.article.client.NaverApiClient;
 import com.kitcha.article.dto.response.RandomNewsResponseDto;
 import com.kitcha.article.service.RandomNewsService;
@@ -20,7 +20,7 @@ public class RandomNewsServiceImpl implements RandomNewsService {
     @Autowired
     private ArticleCrawler articleCrawler;
     @Autowired
-    private GroqApiClient groqApiClient;
+    private OpenAiClient openAiClient;
 
     private static final String[] INTERESTS =
             {"드라마", "엔터", "뮤직", "영화",
@@ -48,11 +48,11 @@ public class RandomNewsServiceImpl implements RandomNewsService {
         String articleContent = articleCrawler.getArticleContent(newsUrl);
 
         // 5. Groq API를 통해 기사 요약
-        Map<String, String> summaries = groqApiClient.getArticleSummaries(articleContent);
+        Map<String, String> summaries = openAiClient.getArticleSummaries(articleContent);
         String longSummary = summaries.getOrDefault("longSummary", "요약 실패");
 
         // 6. 핵심 키워드 추출
-        String keyword = groqApiClient.extractKeyword(longSummary);
+        String keyword = openAiClient.extractKeyword(longSummary);
 
         // 7. DTO 생성 및 반환
         return new RandomNewsResponseDto(newsTitle,longSummary,randomInterest,keyword);
