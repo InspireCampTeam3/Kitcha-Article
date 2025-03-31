@@ -14,15 +14,15 @@ public class InterestServiceClient {
     @Autowired
     private RestTemplate restTemplate;
 
-    private static final String USER_SERVER_API_URL = "http://auth:8091/users/interest";
+    private static final String USER_SERVER_API_URL = "http://interest:8097/interest";
 
 
     public void setInterest(String interest, HttpHeaders headers) {
         // 헤더에서 사용자 ID와 JWT 토큰 가져오기
-        if (!headers.containsKey("X-User-Email") || !headers.containsKey("Authorization")) {
+        if (!headers.containsKey("X-User-Id") || !headers.containsKey("Authorization")) {
             throw new IllegalArgumentException("헤더에 X-User-Email 또는 Authorization이 누락되었습니다.");
         }
-        String userEmail = headers.getFirst("X-User-Email");  // 사용자 ID
+        String userId = headers.getFirst("X-User-Id");  // 사용자 ID
         String jwtToken = headers.getFirst("Authorization");  // JWT 토큰
 
 
@@ -34,7 +34,7 @@ public class InterestServiceClient {
         HttpHeaders requestHeaders = new HttpHeaders();
         requestHeaders.setContentType(MediaType.APPLICATION_JSON);
         requestHeaders.set("Authorization", jwtToken);
-        requestHeaders.set("X-User-Email", userEmail);
+        requestHeaders.set("X-User-Id", userId);
 
         // 4. HTTP 요청 생성
         HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>(requestBody, requestHeaders);
@@ -43,7 +43,7 @@ public class InterestServiceClient {
         // 디버깅 로그
         System.out.println("🚀 [API 요청] 관심사 전달 시작");
         System.out.println("🌐 요청 URL: " + USER_SERVER_API_URL);
-        System.out.println("🔑 X-User-Email: " + userEmail);
+        System.out.println("🔑 X-User-Id: " + userId);
         System.out.println("🔐 JWT Token: " + jwtToken);
         System.out.println("📦 요청 본문: " + requestBody);
 
