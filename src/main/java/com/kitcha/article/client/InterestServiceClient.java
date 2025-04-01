@@ -3,7 +3,6 @@ package com.kitcha.article.client;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,10 +11,7 @@ import java.util.Map;
 public class InterestServiceClient {
 
     @Autowired
-    private RestTemplate restTemplate;
-
-    private static final String USER_SERVER_API_URL = "http://interest:8097/interest";
-
+    private InterestFeignClient interestFeignClient;
 
     public void setInterest(String interest, HttpHeaders headers) {
         // 헤더에서 사용자 ID와 JWT 토큰 가져오기
@@ -30,26 +26,16 @@ public class InterestServiceClient {
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("interest", interest);
 
-        // 3. 헤더 설정 (게이트웨이에서 전달된 값 그대로 사용)
-        HttpHeaders requestHeaders = new HttpHeaders();
-        requestHeaders.setContentType(MediaType.APPLICATION_JSON);
-        requestHeaders.set("Authorization", jwtToken);
-        requestHeaders.set("X-User-Id", userId);
-
-        // 4. HTTP 요청 생성
-        HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>(requestBody, requestHeaders);
-
-
         // 디버깅 로그
         System.out.println("🚀 [API 요청] 관심사 전달 시작");
-        System.out.println("🌐 요청 URL: " + USER_SERVER_API_URL);
+        System.out.println("🌐 요청 URL: /interest");
         System.out.println("🔑 X-User-Id: " + userId);
         System.out.println("🔐 JWT Token: " + jwtToken);
         System.out.println("📦 요청 본문: " + requestBody);
 
-        // 5. 외부 API 호출
+        // Feign 클라이언트를 사용한 다른 마이크로 서비스 API 호출
         try {
-            ResponseEntity<String> response = restTemplate.postForEntity(USER_SERVER_API_URL, requestEntity, String.class);
+            ResponseEntity<Map<String, String>> response = interestFeignClient.setInterest(requestBody, jwtToken, userId);
 
             if (response.getStatusCode().is2xxSuccessful()) {
                 System.out.println("관심사 등록 성공: " + response.getBody());
